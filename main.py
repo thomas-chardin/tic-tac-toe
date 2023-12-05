@@ -30,6 +30,7 @@ class TicTacToe:
                                   [(0, 2), (1, 1), (2, 0)]]
         self.winner = None
         self.game_steps = 0
+        self.font = pg.font.SysFont('Verdana', CELL_SIZE // 4, True)
 
     def check_winner(self):
         for line_indices in self.line_indices_array:
@@ -56,13 +57,15 @@ class TicTacToe:
                     self.game.screen.blit(self.X_image if obj else self.O_image, vec2(x, y) * CELL_SIZE)
 
     def draw_winner(self):
-        self.game.screen.blit(self.field_image, (0, 0))
-        self.draw_objects()
-        self.draw_winner()
+        if self.winner:
+            pg.draw.line(self.game.screen, 'red', *self.winner_line, CELL_SIZE // 8)
+            label = self.font.render(f'Player"{self.winner}" wins!', True, 'white', 'black')
+            self.game.screen.blit(label, (WIN_SIZE // 2 - label.get_width() // 2, WIN_SIZE // 4))
 
     def draw(self):
         self.game.screen.blit(self.field_image, (0, 0))
         self.draw_objects()
+        self.draw_winner()
 
     @staticmethod
     def get_scaled_image(path, res):
@@ -71,6 +74,10 @@ class TicTacToe:
     
     def print_caption(self):
         pg.display.set_caption(f'Player "{"OX"[self.player]}" turn!')
+        if self.winner:
+            pg.display.set_caption(f'Player "{self.winner}" wins! Press Space to Restart')
+        elif self.game_steps == 9:
+            pg.display.set_caption(f'Game Over! Press Space to Restart')
 
     def run(self):
         self.print_caption()
