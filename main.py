@@ -39,6 +39,7 @@ class TicTacToe:
                 self.winner = 'XO'[sum_line == 0]
                 self.winner_line = [vec2(line_indices[0][::-1]) * CELL_SIZE + CELL_CENTER,
                                     vec2(line_indices[2][::-1]) * CELL_SIZE + CELL_CENTER]
+                
     def run_game_process(self):
         current_cell = vec2(pg.mouse.get_pos()) // CELL_SIZE
         col, row = map(int, current_cell)
@@ -59,7 +60,7 @@ class TicTacToe:
     def draw_winner(self):
         if self.winner:
             pg.draw.line(self.game.screen, 'red', *self.winner_line, CELL_SIZE // 8)
-            label = self.font.render(f'Player"{self.winner}" wins!', True, 'white', 'black')
+            label = self.font.render(f'Player "{self.winner}" wins!', True, 'white', 'black')
             self.game.screen.blit(label, (WIN_SIZE // 2 - label.get_width() // 2, WIN_SIZE // 4))
 
     def draw(self):
@@ -71,18 +72,37 @@ class TicTacToe:
     def get_scaled_image(path, res):
         img = pg.image.load(path)
         return pg.transform.smoothscale(img, res)
-    
+
     def print_caption(self):
-        pg.display.set_caption(f'Player "{"OX"[self.player]}" turn!')
+        pg.display.set_caption(f'Player {"OX"[self.player]}\'s turn!')
         if self.winner:
             pg.display.set_caption(f'Player "{self.winner}" wins! Press Space to Restart')
         elif self.game_steps == 9:
             pg.display.set_caption(f'Game Over! Press Space to Restart')
 
     def run(self):
-        self.print_caption()
-        self.draw()
-        self.run_game_process()
+        while True:
+            self.check_winner()
+            self.draw()
+            self.run_game_process()
+            self.print_caption()
+            pg.display.update()
+            self.game.clock.tick(60)
+
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+                elif event.type == pg.KEYDOWN:
+                    if event.key == pg.K_SPACE:
+                        
+                        self.game_array = [[INF, INF, INF],
+                                           [INF, INF, INF],
+                                           [INF, INF, INF]]
+                        self.player = randint(0, 1)
+                        self.winner = None
+                        self.game_steps = 0
+                        self.winner_line = None
 
 class Game:
     def __init__(self):
